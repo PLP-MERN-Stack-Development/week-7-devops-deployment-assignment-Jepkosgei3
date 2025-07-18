@@ -17,17 +17,9 @@ jobs:
         working-directory: ./server
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Install Backend Dependencies
+      - name: Install dependencies
         run: pnpm install
-
-      - name: Run Backend Tests
+      - name: Run backend tests
         run: pnpm test || echo "No tests found"
 
   test-frontend:
@@ -38,22 +30,11 @@ jobs:
         working-directory: ./client
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Install Frontend Dependencies
+      - name: Install dependencies with force
         run: |
-          npm install --legacy-peer-deps
-          if ! npm list @vitejs/plugin-react; then
-            echo "Installing missing plugin-react..."
-            npm install @vitejs/plugin-react@latest
-          fi
-
-      - name: Build Frontend
+          npm install --force
+          npm install @vitejs/plugin-react --save
+      - name: Build frontend
         run: pnpm run build
 
   deploy-frontend:
@@ -64,7 +45,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
