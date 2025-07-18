@@ -25,10 +25,10 @@ jobs:
           cache: 'npm'
 
       - name: Install Backend Dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Run Backend Tests
-        run: npm test || echo "No tests found"
+        run: pnpm test || echo "No tests found"
 
   test-frontend:
     name: 🧪 Test Frontend
@@ -54,7 +54,7 @@ jobs:
           fi
 
       - name: Build Frontend
-        run: npm run build
+        run: pnpm run build
 
   deploy-frontend:
     name: 🚀 Deploy Frontend to Vercel
