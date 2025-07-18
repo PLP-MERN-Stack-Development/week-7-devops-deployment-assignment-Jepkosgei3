@@ -1,0 +1,16 @@
+{
+  "name": "Chat App",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  "forwardPorts": [5173, 5000],
+  "portsAttributes": {
+    "5173": {
+      "label": "Client",
+      "onAutoForward": "openPreview"
+    },
+    "5000": {
+      "label": "Server",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "cd client && pnpm install && cd ../server && pnpm install"
+}
