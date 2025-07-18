@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+env:
+  NODE_ENV: production
+
 jobs:
   test-backend:
     name: 🧪 Test Backend
@@ -14,7 +17,7 @@ jobs:
         working-directory: ./server
     steps:
       - uses: actions/checkout@v3
-      - name: Install backend dependencies
+      - name: Install dependencies
         run: npm install
       - name: Run backend tests
         run: npm test || echo "No tests found"
@@ -27,52 +30,48 @@ jobs:
         working-directory: ./client
     steps:
       - uses: actions/checkout@v3
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: npm install
       - name: Build frontend
         run: npm run build
 
   deploy-frontend:
-    name: 🚀 Deploy Frontend (Vercel)
+    name: 🚀 Deploy Frontend to Vercel
+    environment: ChatApp
     needs: [test-frontend]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Vercel Deployment
+      - uses: actions/checkout@v3
+      - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-args: '--prod'
-          working-directory: ./client
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./client
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: ✅ Check Frontend Health
+        run: |
+          echo "Checking frontend at ${{ secrets.FRONTEND_URL }}"
+          curl -sSf ${{ secrets.FRONTEND_URL }}
 
   deploy-backend:
-    name: 🚀 Deploy Backend (Render)
+    name: 🚀 Deploy Backend to Render
+    environment: ChatApp
     needs: [test-backend]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Render (via webhook)
+      - name: Trigger Render Deploy Hook
         run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
-
-  # Run health checks after deployment
-  health-check:
-    needs: [deploy-backend, deploy-frontend]
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Check backend health
-        uses: jtalk/url-health-check-action@v3
-        with:
-          url: ${{ secrets.BACKEND_URL }}/api/health
-          max-attempts: 3
-          retry-delay: 5s
-      
-      - name: Check frontend
-        uses: jtalk/url-health-check-action@v3
-        with:
-          url: ${{ secrets.FRONTEND_URL }}
-          max-attempts: 3
-          retry-delay: 5s 
+      - name: 🩺 Check Backend Health
+        run: |
+          echo "Waiting 30s for backend to restart..."
+          sleep 30
+          echo "Checking backend at ${{ secrets.BACKEND_URL }}/health"
+          curl -sSf ${{ secrets.BACKEND_URL }}/health
