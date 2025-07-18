@@ -11,7 +11,7 @@ function RoomSelector({ onJoin }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/rooms`, {
+    axios.get(`${API_BASE_URL}rooms`, {
       withCredentials: true,
     })
       .then(res => {
@@ -28,7 +28,7 @@ function RoomSelector({ onJoin }) {
   const handleCreateRoom = async () => {
     if (!newRoom) return;
     try {
-      const res = await axios.post(`${API_BASE_URL}/rooms`, { name: newRoom }, {
+      const res = await axios.post(`${API_BASE_URL}rooms`, { name: newRoom }, {
         withCredentials: true,
       });
       console.log('Room created successfully:', res.data);
@@ -45,7 +45,7 @@ function RoomSelector({ onJoin }) {
   const handleDeleteRoom = async (roomName) => {
     if (window.confirm(`Are you sure you want to delete the room "${roomName}"?`) && username === 'admin') {
       try {
-        await axios.delete(`${API_BASE_URL}/rooms/${roomName}`, {
+        await axios.delete(`${API_BASE_URL}rooms/${roomName}`, {
           withCredentials: true,
         });
         setRooms(rooms.filter(room => room.name !== roomName));
