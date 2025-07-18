@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
 
 function RoomSelector({ onJoin }) {
   const [rooms, setRooms] = useState([]);
