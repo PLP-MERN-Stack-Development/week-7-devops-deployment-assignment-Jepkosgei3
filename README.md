@@ -116,36 +116,104 @@ npm run dev
 Workflow file: `.github/workflows/mern-ci-cd.yml`
 
 ```yaml
-name: MERN CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+
+env:
+  NODE_ENV: production
 
 jobs:
-  build-deploy:
+  test-backend:
+    name: 🧪 Test Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install backend dependencies
+        run: pnpm install
+
+      - name: Run backend tests
+        run: pnpm test || echo "No tests found"
+
+  test-frontend:
+    name: 🧪 Test Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./client
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install frontend dependencies
+        run: pnpm install
+
+      - name: Build frontend
+        run: pnpm run build
+
+  deploy-frontend:
+    name: 🚀 Deploy Frontend to Vercel
+    environment: ChatApp
+    needs: [test-frontend]
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: ⬇️ Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: 🔧 Install Dependencies
-        run: |
-          cd client
-          npm install
-
-      - name: ✅ Check Frontend Health
-        run: curl -sSf ${{ secrets.FRONTEND_URL }}
-
-      - name: 🚀 Deploy to Vercel
+      - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./client
-          prod: true
+          vercel-args: '--prod'
+          
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: ✅ Check Frontend Health
+        run: |
+          echo "Checking frontend at ${{ secrets.FRONTEND_URL }}"
+          curl -sSf ${{ secrets.FRONTEND_URL }}
+
+  deploy-backend:
+    name: 🚀 Deploy Backend to Render
+    environment: ChatApp
+    needs: [test-backend]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+      - name: 🩺 Check Backend Health
+        run: |
+          echo "Waiting 30s for backend to restart..."
+          sleep 30
+          echo "Checking backend at ${{ secrets.BACKEND_URL }}/health"
+          curl -sSf ${{ secrets.BACKEND_URL }}/health
 ```
 
 ---
