@@ -1,6 +1,3 @@
-Perfect — here’s a **production-ready README** for your deployed MERN Chat App with CI/CD, Vercel, and Render integrations:
-
----
 
 # 🗨️ MERN Chat App – Real-Time Messaging with DevOps 🚀
 
