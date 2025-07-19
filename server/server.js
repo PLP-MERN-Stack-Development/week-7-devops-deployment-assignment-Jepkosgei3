@@ -12,24 +12,25 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Use allowed origins from .env (fallback to localhost)
+// ✅ Use allowed origins from .env or fallback to localhost
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:5173'
 ];
 
-// ✅ Global CORS Middleware
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  }
-  next();
-});
+// ✅ Proper CORS middleware
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like curl or Postman) or from allowedOrigins
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+app.options('*', cors()); // Enable preflight CORS
 
-app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
 // ✅ MongoDB connection
@@ -85,7 +86,13 @@ app.delete('/rooms/:name', async (req, res) => {
 // ✅ Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST', 'DELETE'],
     credentials: true,
   },
