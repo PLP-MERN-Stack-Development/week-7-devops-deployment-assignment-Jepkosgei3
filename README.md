@@ -1,78 +1,173 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=19954996&assignment_repo_type=AssignmentRepo)
-# Deployment and DevOps for MERN Applications
+Perfect — here’s a **production-ready README** for your deployed MERN Chat App with CI/CD, Vercel, and Render integrations:
 
-This assignment focuses on deploying a full MERN stack application to production, implementing CI/CD pipelines, and setting up monitoring for your application.
+---
 
-## Assignment Overview
+# 🗨️ MERN Chat App – Real-Time Messaging with DevOps 🚀
 
-You will:
-1. Prepare your MERN application for production deployment
-2. Deploy the backend to a cloud platform
-3. Deploy the frontend to a static hosting service
-4. Set up CI/CD pipelines with GitHub Actions
-5. Implement monitoring and maintenance strategies
+This is a real-time chat application built with the **MERN stack** (MongoDB, Express, React, Node.js), using **Socket.io** for live communication, deployed via **Vercel** (frontend) and **Render** (backend), and integrated with **GitHub Actions** for continuous deployment.
 
-## Getting Started
+Live Demo:
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Follow the setup instructions in the `Week7-Assignment.md` file
-4. Use the provided templates and configuration files as a starting point
+* 🖥️ Frontend: [https://chatapp-uuci.vercel.app/](https://chatapp-uuci.vercel.app/)
+* 🌐 Backend: [https://week-7-devops-deployment-assignment-9ycj.onrender.com/rooms](https://week-7-devops-deployment-assignment-9ycj.onrender.com/rooms)
 
-## Files Included
+---
 
-- `Week7-Assignment.md`: Detailed assignment instructions
-- `.github/workflows/`: GitHub Actions workflow templates
-- `deployment/`: Deployment configuration files and scripts
-- `.env.example`: Example environment variable templates
-- `monitoring/`: Monitoring configuration examples
+## 📦 Tech Stack
 
-## Requirements
+* **Frontend:** React + Tailwind CSS + Vite
+* **Backend:** Express.js + Node.js + MongoDB
+* **Realtime:** Socket.io
+* **Database:** MongoDB Atlas
+* **CI/CD:** GitHub Actions + Vercel + Render
 
-- A completed MERN stack application from previous weeks
-- Accounts on the following services:
-  - GitHub
-  - MongoDB Atlas
-  - Render, Railway, or Heroku (for backend)
-  - Vercel, Netlify, or GitHub Pages (for frontend)
-- Basic understanding of CI/CD concepts
+---
 
-## Deployment Platforms
+## ✨ Features
 
-### Backend Deployment Options
-- **Render**: Easy to use, free tier available
-- **Railway**: Developer-friendly, generous free tier
-- **Heroku**: Well-established, extensive documentation
+* 🔒 Room creation & deletion (admin-only)
+* ⚡ Real-time chat with Socket.io
+* 💬 Message persistence in MongoDB
+* 📁 Room selection and joining
+* 📝 Typing indicators
+* 🧑 Online users list
+* 🎨 Responsive modern UI with Tailwind CSS
+* 🚀 CI/CD with automated deployments
 
-### Frontend Deployment Options
-- **Vercel**: Optimized for React apps, easy integration
-- **Netlify**: Great for static sites, good CI/CD
-- **GitHub Pages**: Free, integrated with GitHub
+---
 
-## CI/CD Pipeline
+## 🛠 Project Structure
 
-The assignment includes templates for setting up GitHub Actions workflows:
-- `frontend-ci.yml`: Tests and builds the React application
-- `backend-ci.yml`: Tests the Express.js backend
-- `frontend-cd.yml`: Deploys the frontend to your chosen platform
-- `backend-cd.yml`: Deploys the backend to your chosen platform
+```
+├── client/              # Frontend React app (Vercel)
+│   └── src/
+│       └── components/
+│       └── App.jsx
+│       └── main.jsx
+├── server/              # Backend Node + Express app (Render)
+│   └── controllers/
+│   └── models/
+│   └── routes/
+│   └── socket/
+│   └── server.js
+├── .github/workflows/   # GitHub Actions for CI/CD
+│   └── mern-ci-cd.yml
+```
 
-## Submission
+---
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+## 🚀 Local Development
 
-1. Complete all deployment tasks
-2. Set up CI/CD pipelines with GitHub Actions
-3. Deploy both frontend and backend to production
-4. Document your deployment process in the README.md
-5. Include screenshots of your CI/CD pipeline in action
-6. Add URLs to your deployed applications
+### 1. Clone Repo
 
-## Resources
+```bash
+git clone https://github.com/PLP-MERN-Stack-Development/week-7-devops-deployment-assignment-Jepkosgei3.git
+cd week-7-devops-deployment-assignment-Jepkosgei3
+```
 
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [MongoDB Atlas Documentation](https://docs.atlas.mongodb.com/)
-- [Render Documentation](https://render.com/docs)
-- [Railway Documentation](https://docs.railway.app/)
-- [Vercel Documentation](https://vercel.com/docs)
-- [Netlify Documentation](https://docs.netlify.com/) 
+### 2. Set Up Environment Variables
+
+#### In `client/.env`:
+
+```env
+VITE_API_BASE_URL=https://your-backend-url.onrender.com
+```
+
+#### In `server/.env`:
+
+```env
+PORT=4000
+MONGO_URI=mongodb+srv://<your_mongo_uri>
+CORS_ORIGIN=https://your-frontend-url.vercel.app
+```
+
+### 3. Run Locally
+
+#### Backend:
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+#### Frontend:
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+---
+
+## 🔄 Deployment
+
+### Frontend – Vercel
+
+* Auto-deploys on `main` branch push
+* Uses `vercel.json` to define build settings
+
+### Backend – Render
+
+* Create Web Service from `server/`
+* Add `web: node server.js` as start command
+* Set environment variables in Render dashboard
+
+### CI/CD – GitHub Actions
+
+Workflow file: `.github/workflows/mern-ci-cd.yml`
+
+```yaml
+name: MERN CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Install Dependencies
+        run: |
+          cd client
+          npm install
+
+      - name: ✅ Check Frontend Health
+        run: curl -sSf ${{ secrets.FRONTEND_URL }}
+
+      - name: 🚀 Deploy to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./client
+          prod: true
+```
+
+---
+
+## 📷 Screenshots
+
+<img src="./images/creating-room.png" width="500"/>
+<img src="./images/user1-chat.png" width="500"/>
+<img src="./images/user2-join.png" width="500"/>
+<img src="./images/user2-chat.png" width="500"/>
+
+---
+
+
+## 👩🏽‍💻 Author
+
+**Mercy Jepkosgei**
+[GitHub](https://github.com/Jepkosgei3)
+
+
+
+
